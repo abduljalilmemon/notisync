@@ -4,6 +4,7 @@ from rest_framework import status
 from .models import NotificationTemplate, NotificationQueue
 from users.models import CustomUser, Organization
 from .serializers import NotificationSendSerializer
+from .tasks import process_notification
 from django.shortcuts import get_object_or_404
 
 class SendNotificationAPIView(APIView):
@@ -15,12 +16,15 @@ class SendNotificationAPIView(APIView):
             template = get_object_or_404(NotificationTemplate, org=org, key=serializer.validated_data['template_key'])
 
             # Create a notification queue entry
-            NotificationQueue.objects.create(
+            notif = NotificationQueue.objects.create(
                 template=template,
                 user=user,
-                params=serializer.validated_data['params'],
+                params=serializer.validated_data["params"],
                 status="queued"
             )
+
+            # Call Celery task asynchronously
+            process_notification.delay(notif.id)
 
             return Response({"message": "Notification queued successfully"}, status=status.HTTP_202_ACCEPTED)
 

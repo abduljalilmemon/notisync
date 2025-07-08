@@ -12,6 +12,8 @@ bin/
 var/
 *.log
 
+test.py
+
 # Django
 *.sqlite3
 db.sqlite3
