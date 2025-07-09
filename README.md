@@ -1,39 +1,132 @@
 # 📣 Notisync
 
-**Notisync** is a scalable, multi-tenant notification system built with Django Rest Framework. It allows applications to send and manage notifications via Email, SMS, Webhooks, and In-App messaging, all through a single unified API.
+**Notisync** is a scalable, multi-tenant notification system built with Django Rest Framework. It allows applications to send and manage notifications via Email, SMS, Webhooks, and In-App messaging — all through a single unified API.
 
-Built for modern SaaS applications, Notisync enables dynamic templating, per-user preferences, asynchronous delivery, and retry mechanisms – making it ideal for high-volume, real-time alert systems.
-
----
-
-## ✅ Features Implemented So Far
-
-- 🔐 **Token-Based Authentication** using DRF’s `TokenAuthentication`
-- 👥 **Multi-Tenant User & Organization Structure** with proper org-user linkage
-- 📨 **Notification Template System**
-  - Supports dynamic variables via `{{ }}` in message body
-  - Linked to specific organizations
-- 📬 **Notify API Endpoint (`/api/notify/`)**
-  - Accepts a `template_key`, `user_id`, and dynamic `params`
-  - Resolves the correct template for the user's organization
-  - Renders and validates the final message
-- 🧪 **API Successfully Tested** using Python’s `requests` library
-- 🚫 Graceful error handling with proper HTTP status codes (e.g., 404 if template not found)
+Ideal for modern SaaS applications, Notisync supports dynamic templating, user preferences, async delivery, and retry mechanisms.
 
 ---
 
-## 🛠️ Next Up
+## ✅ Features
 
-- ⚙️ Integrate **Celery** for async background processing
-- 🔁 Implement **Redis** as Celery broker
-- 📡 Add actual **channel delivery logic** (Email, SMS, Webhook)
-- 🎛️ User-specific **notification preferences**
-- 📊 Delivery tracking & retry queue
+- 🔌 Unified API for multi-channel notifications
+- ✉️ Email, SMS, Webhook delivery channels (plug & play support)
+- 🧩 Dynamic Jinja2-based templating
+- 🔁 Asynchronous background task handling via **Celery**
+- ⚙️ Redis integration as a **Celery broker**
+- 🧑‍💼 User-specific notification preferences
+- 🚦 Delivery status tracking & retry queue
+- 🧪 Easy-to-test, extendable architecture
+- 🌐 Multi-tenant org-based data handling
+
+---
+
+## 📦 Technologies Used
+
+- **Backend:** Django, Django REST Framework
+- **Task Queue:** Celery
+- **Message Broker:** Redis
+- **Templating:** Jinja2
+- **Database:** SQLite (default, can be changed)
+- **Frontend (upcoming):** React + Vite
 
 ---
 
-## 🔗 How to Contribute
+## 🚀 Getting Started
 
-Pull requests are welcome! If you're interested in contributing or testing, feel free to open an issue or fork the project.
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/your-username/notisync.git
+cd notisync
+```
+
+### 2. Create Virtual Environment
+
+```bash
+python -m venv venv
+venv\Scripts\activate    # On Windows
+# source venv/bin/activate  # On macOS/Linux
+```
+
+### 3. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Run Redis (required for Celery)
+
+Make sure Redis is running on `localhost:6379`. You can install it via:
+
+- Windows: https://github.com/tporadowski/redis
+- Mac (brew): `brew install redis`
+- Linux: `sudo apt install redis`
+
+Then start the Redis server.
 
 ---
+
+### 5. Run Migrations
+
+```bash
+python manage.py migrate
+```
+
+### 6. Create Superuser (optional)
+
+```bash
+python manage.py createsuperuser
+```
+
+---
+
+### 7. Start Django Server
+
+```bash
+python manage.py runserver
+```
+
+### 8. Start Celery Worker
+
+```bash
+celery -A notisync worker --loglevel=info
+```
+
+---
+
+## 📂 Project Structure
+
+```
+notisync/
+├── notisync/              # Django project settings
+├── notifications/         # Core notification logic
+├── users/                 # User and org models
+├── test.py                # Sample script for testing
+├── db.sqlite3             # Default DB
+├── README.md
+├── manage.py
+└── venv/                  # Virtual environment
+```
+
+---
+
+## 🧪 Test Notification
+
+You can test a notification by calling the API or running `test.py` which triggers a Celery task using a defined notification template.
+
+---
+
+## 🖼️ Frontend (Coming Soon)
+
+We're planning to build a lightweight React frontend using **Vite** for:
+
+- Managing templates
+- Viewing delivery logs
+- Admin dashboards
+- User preferences
+
+---
+
+## 🧠 Contributing
+
+Contributions are welcome! Clone the repo, make changes, and open a pull request.
