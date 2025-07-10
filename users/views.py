@@ -1,3 +1,10 @@
-from django.shortcuts import render
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
 
-# Create your views here.
+class CustomAuthToken(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        token = Token.objects.get(key=response.data['token'])
+        print(token.key, token.user_id)
+        return Response({'token': token.key, 'user_id': token.user_id})

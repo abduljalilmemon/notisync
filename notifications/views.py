@@ -1,9 +1,11 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from .models import NotificationTemplate, NotificationQueue
 from users.models import CustomUser, Organization
-from .serializers import NotificationSendSerializer
+from .serializers import NotificationSendSerializer, NotificationQueueSerializer
+
 from .tasks import process_notification
 from django.shortcuts import get_object_or_404
 
@@ -29,3 +31,13 @@ class SendNotificationAPIView(APIView):
             return Response({"message": "Notification queued successfully"}, status=status.HTTP_202_ACCEPTED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+class NotificationListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        notifications = NotificationQueue.objects.filter(user=request.user).order_by('-created_at')
+        serializer = NotificationQueueSerializer(notifications, many=True)
+        return Response(serializer.data)
