@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 interface LoginFormProps {
-  onLoginSuccess: (token: string) => void;
+  onLoginSuccess: (accessToken: string, refreshToken: string) => void;
 }
+
 
 const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   const [username, setUsername] = useState('');
@@ -19,8 +20,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         username,
         password,
       });
-      const token = response.data.token;
-      onLoginSuccess(token);
+      const { access, refresh } = response.data;
+      onLoginSuccess(access, refresh);
+
     } catch (err) {
       setError('Invalid credentials');
     }
