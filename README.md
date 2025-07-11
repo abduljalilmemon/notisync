@@ -1,33 +1,36 @@
+
 # 📣 Notisync
 
-**Notisync** is a scalable, multi-tenant notification system built with Django Rest Framework. It allows applications to send and manage notifications via Email, SMS, Webhooks, and In-App messaging — all through a single unified API.
+**Notisync** is a scalable, multi-tenant notification system built with Django Rest Framework + React. It allows applications to send and manage notifications via Email, SMS, Webhooks, and In-App messaging — all through a single unified API and frontend.
 
-Ideal for modern SaaS applications, Notisync supports dynamic templating, user preferences, async delivery, and retry mechanisms.
+Ideal for modern SaaS applications, Notisync supports dynamic templating, user preferences, async delivery, JWT authentication, and retry mechanisms.
 
 ---
 
 ## ✅ Features
 
+- 🔐 JWT-based authentication with access & refresh tokens
 - 🔌 Unified API for multi-channel notifications
 - ✉️ Email, SMS, Webhook delivery channels (plug & play support)
 - 🧩 Dynamic Jinja2-based templating
-- 🔁 Asynchronous background task handling via **Celery**
+- 🔁 Async background task handling via **Celery**
 - ⚙️ Redis integration as a **Celery broker**
 - 🧑‍💼 User-specific notification preferences
 - 🚦 Delivery status tracking & retry queue
 - 🧪 Easy-to-test, extendable architecture
 - 🌐 Multi-tenant org-based data handling
+- 💻 Frontend with login + notification list (React + Vite)
 
 ---
 
 ## 📦 Technologies Used
 
-- **Backend:** Django, Django REST Framework
+- **Backend:** Django, Django REST Framework, SimpleJWT
 - **Task Queue:** Celery
 - **Message Broker:** Redis
 - **Templating:** Jinja2
-- **Database:** SQLite (default, can be changed)
-- **Frontend (upcoming):** React + Vite
+- **Frontend:** React + Vite + TailwindCSS
+- **Database:** SQLite (default, can be swapped)
 
 ---
 
@@ -56,7 +59,7 @@ pip install -r requirements.txt
 
 ### 4. Run Redis (required for Celery)
 
-Make sure Redis is running on `localhost:6379`. You can install it via:
+Make sure Redis is running on `localhost:6379`. Install it via:
 
 - Windows: https://github.com/tporadowski/redis
 - Mac (brew): `brew install redis`
@@ -94,39 +97,41 @@ celery -A notisync worker --loglevel=info
 
 ---
 
+## 💻 Frontend Setup
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Runs on `http://localhost:5173`
+
+### 🔐 Login
+Login via `/api/login/` using a valid username/password.
+Stores access & refresh tokens in localStorage.
+
+### 🔄 Token Refresh
+The frontend automatically refreshes the access token when it expires using the stored refresh token.
+
+### 🔔 Notifications
+After login, the user sees all of their notifications in a modern UI grouped by status (e.g. Sent, Queued).
+
+---
+
 ## 📂 Project Structure
 
 ```
 notisync/
 ├── notisync/              # Django project settings
 ├── notifications/         # Core notification logic
-├── users/                 # User and org models
-├── test.py                # Sample script for testing
+├── users/                 # Auth & user models
+├── frontend/              # React + Vite frontend
+├── test.py                # Sample Celery test script
 ├── db.sqlite3             # Default DB
 ├── README.md
 ├── manage.py
-└── venv/                  # Virtual environment
+└── venv/                  # Python virtual environment
 ```
 
 ---
-
-## 🧪 Test Notification
-
-You can test a notification by calling the API or running `test.py` which triggers a Celery task using a defined notification template.
-
----
-
-## 🖼️ Frontend (Coming Soon)
-
-We're planning to build a lightweight React frontend using **Vite** for:
-
-- Managing templates
-- Viewing delivery logs
-- Admin dashboards
-- User preferences
-
----
-
-## 🧠 Contributing
-
-Contributions are welcome! Clone the repo, make changes, and open a pull request.
