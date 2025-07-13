@@ -1,10 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import status
+from rest_framework import status, viewsets, permissions
 from .models import NotificationTemplate, NotificationQueue
 from users.models import CustomUser, Organization
-from .serializers import NotificationSendSerializer, NotificationQueueSerializer
+from .serializers import NotificationSendSerializer, NotificationQueueSerializer, NotificationTemplateSerializer
 
 from .tasks import process_notification
 from django.shortcuts import get_object_or_404
@@ -41,3 +41,19 @@ class NotificationListView(APIView):
         notifications = NotificationQueue.objects.filter(user=request.user).order_by('-created_at')
         serializer = NotificationQueueSerializer(notifications, many=True)
         return Response(serializer.data)
+    
+
+class IsAdmin(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user and request.user.is_staff
+
+class NotificationTemplateViewSet(viewsets.ModelViewSet):
+    queryset = NotificationTemplate.objects.all()
+    serializer_class = NotificationTemplateSerializer
+    permission_classes = [IsAdmin]
+
+    def get_queryset(self):
+        return NotificationTemplate.objects.filter(org=self.request.user.org)
+
+    def perform_create(self, serializer):
+        serializer.save(org=self.request.user.org)

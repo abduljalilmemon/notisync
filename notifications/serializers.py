@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import NotificationQueue
+from .models import NotificationQueue, NotificationTemplate
 
 class NotificationSendSerializer(serializers.Serializer):
     template_key = serializers.CharField()
@@ -15,3 +15,9 @@ class NotificationQueueSerializer(serializers.ModelSerializer):
     class Meta:
         model = NotificationQueue
         fields = ['id', 'subject', 'body', 'params', 'status', 'retries', 'created_at']
+
+
+class NotificationTemplateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NotificationTemplate
+        fields = "__all__"

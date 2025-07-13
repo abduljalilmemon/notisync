@@ -4,6 +4,8 @@ import { jwtDecode } from 'jwt-decode';
 import LoginForm from './components/LoginForm';
 import LogoutModal from './components/LogoutModal';
 import NotificationList from './components/NotificationList';
+import TemplateManager from './components/TemplateManager';
+
 
 interface DecodedToken {
   username: string;
@@ -17,14 +19,29 @@ function App() {
   );
   const [notifications, setNotifications] = useState<any[]>([]);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [user, setUser] = useState<{ username: string; is_staff: boolean } | null>(null);
+
 
 
   useEffect(() => {
     if (accessToken) {
       const decoded: DecodedToken = jwtDecode(accessToken);
       fetchNotifications();
+      fetchUserInfo(); 
     }
   }, [accessToken]);
+
+  const fetchUserInfo = async () => {
+    try {
+      const res = await axios.get('http://localhost:8000/api/me/', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      console.log(res)
+      setUser(res.data);
+    } catch (err) {
+      console.error('Failed to fetch user info:', err);
+    }
+  };
 
   const fetchNotifications = async () => {
     try {
@@ -109,6 +126,8 @@ function App() {
       </div>
 
       <NotificationList notifications={notifications} />
+
+      {user?.is_staff && <TemplateManager token={accessToken} />}
 
       <LogoutModal
         isOpen={showLogoutModal}
