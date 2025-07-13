@@ -1,14 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import LoginForm from './components/LoginForm';
-import NotificationList from './components/NotificationList';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
+import LoginForm from './components/LoginForm';
+import LogoutModal from './components/LogoutModal';
+import NotificationList from './components/NotificationList';
+
+interface DecodedToken {
+  username: string;
+  exp: number;
+  // Add other fields if needed
+}
 
 function App() {
-  const [accessToken, setAccessToken] = useState<string | null>(localStorage.getItem('access_token'));
+  const [accessToken, setAccessToken] = useState<string | null>(
+    localStorage.getItem('access_token')
+  );
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
 
   useEffect(() => {
     if (accessToken) {
+      const decoded: DecodedToken = jwtDecode(accessToken);
       fetchNotifications();
     }
   }, [accessToken]);
@@ -20,16 +33,14 @@ function App() {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      console.log(response)
       setNotifications(response.data);
     } catch (err: any) {
-      // If token expired (401), try refreshing
       if (err.response?.status === 401) {
         const newAccess = await refreshAccessToken();
         if (newAccess) {
           setAccessToken(newAccess);
         } else {
-          setAccessToken(null);
+          handleLogout(false); // logout silently
         }
       } else {
         console.error('Failed to fetch notifications', err);
@@ -42,7 +53,7 @@ function App() {
     if (!refreshToken) return null;
 
     try {
-      const response = await axios.post('http://localhost:8000/api/token/refresh/', {
+      const response = await axios.post('http://localhost:8000/api/refresh/', {
         refresh: refreshToken,
       });
       const newAccess = response.data.access;
@@ -52,6 +63,25 @@ function App() {
       console.error('Refresh token failed', err);
       return null;
     }
+  };
+
+  const handleLogout = (askConfirm = true) => {
+    if (askConfirm) {
+      setShowLogoutModal(true);
+      return;
+    }
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    setAccessToken(null);
+  };
+
+  const confirmLogout = () => {
+    handleLogout(false);
+    setShowLogoutModal(false);
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutModal(false);
   };
 
   if (!accessToken) {
@@ -66,7 +96,28 @@ function App() {
     );
   }
 
-  return <NotificationList notifications={notifications} />;
+  return (
+    <div className="min-h-screen bg-black-50">
+      <div className="flex justify-between items-center p-4">
+        <h1 className="text-lg font-semibold"></h1>
+        <button
+          onClick={() => handleLogout(true)}
+          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+        >
+          Logout
+        </button>
+      </div>
+
+      <NotificationList notifications={notifications} />
+
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onConfirm={confirmLogout}
+        onCancel={cancelLogout}
+      />
+    </div>
+  );
+
 }
 
 export default App;
