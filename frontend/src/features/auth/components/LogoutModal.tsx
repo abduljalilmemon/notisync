@@ -1,10 +1,5 @@
 import React from 'react';
-
-interface LogoutModalProps {
-  isOpen: boolean;
-  onConfirm: () => void;
-  onCancel: () => void;
-}
+import type { LogoutModalProps } from '../types';
 
 const LogoutModal: React.FC<LogoutModalProps> = ({ isOpen, onConfirm, onCancel }) => {
   if (!isOpen) return null;

@@ -1,13 +1,8 @@
 // File: frontend/src/components/TemplateManager.tsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-
-interface Template {
-  id: number;
-  key: string;
-  subject: string;
-  body: string;
-}
+import { deleteTemplate, createTemplate, getTemplates, updateTemplate  } from '../api';
+import type { Template } from '../types'; 
 
 export default function TemplateManager({ token }: { token: string }) {
   const [templates, setTemplates] = useState<Template[]>([]);
@@ -41,12 +36,6 @@ export default function TemplateManager({ token }: { token: string }) {
     setEditingId(template.id);
   };
 
-  const deleteTemplate = async (id: number) => {
-    await axios.delete(`http://localhost:8000/api/templates/${id}/`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    fetchTemplates();
-  };
 
   useEffect(() => {
     fetchTemplates();
@@ -88,7 +77,7 @@ export default function TemplateManager({ token }: { token: string }) {
             <p className="text-sm whitespace-pre-wrap mt-1">{template.body}</p>
             <div className="mt-2 flex gap-2">
               <button onClick={() => editTemplate(template)} className="px-3 py-1 text-sm bg-blue-500 text-white rounded">Edit</button>
-              <button onClick={() => deleteTemplate(template.id)} className="px-3 py-1 text-sm bg-red-500 text-white rounded">Delete</button>
+              <button onClick={() => deleteTemplate(token, template.id)} className="px-3 py-1 text-sm bg-red-500 text-white rounded">Delete</button>
             </div>
           </li>
         ))}

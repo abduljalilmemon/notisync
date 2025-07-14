@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-
-interface LoginFormProps {
-  onLoginSuccess: (accessToken: string, refreshToken: string) => void;
-}
+import type { LoginFormProps } from '../types';
 
 const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   const [username, setUsername] = useState('');
