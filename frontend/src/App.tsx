@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Routes, Route, Navigate } from "react-router-dom";
 import axios from 'axios';
 import LoginForm from './features/auth/components/LoginForm';
 import LogoutModal from './features/auth/components/LogoutModal';
@@ -6,6 +7,7 @@ import NotificationList from './features/notifications/components/NotificationLi
 import TemplateManager from './features/templates/components/TemplateManager';
 import Sidebar from './components/Sidebar';
 import { useAuth } from './features/auth/hooks/useAuth';
+import routes from './routes/AppRoutes';
 
 function App() {
   const {
@@ -39,7 +41,27 @@ function App() {
   };
 
   if (!isAuthenticated) {
-    return <LoginForm onLoginSuccess={login} />;
+      return (
+        <Routes>
+          {routes.map(({ layout, pages }) =>
+            layout === "auth"
+              ? pages.map(({ path }) => {
+                  if (path === "sign-in") {
+                    return (
+                      <Route
+                        key={path}
+                        path={`/auth/${path}`}
+                        element={<LoginForm onLoginSuccess={login} />}
+                      />
+                    );
+                  }
+                  return null;
+                })
+              : null
+          )}
+          <Route path="*" element={<Navigate to="/auth/sign-in" replace />} />
+        </Routes>
+      );
   }
 
   return (
